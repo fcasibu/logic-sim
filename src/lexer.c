@@ -69,7 +69,7 @@ AdvanceLexer(void)
 internal token
 LexerIdentifier(void)
 {
-    while (isalpha(PeekLexer()) && PeekLexer() != '\0')
+    while (isalnum(PeekLexer()) && PeekLexer() != '\0')
         AdvanceLexer();
 
     usize length = Lexer.current_char - Lexer.lexeme_start;
@@ -110,7 +110,8 @@ ScanToken(void)
             if (isalpha(ch))
                 return LexerIdentifier();
 
-            Todo("Reporting");
+            // TODO(fcasibu): Reporting
+            return MakeToken(TokenKind_Error);
         };
     }
 }

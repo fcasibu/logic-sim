@@ -11,6 +11,17 @@ InitializeStringInternPool(memory_arena *arena, usize initial_cap)
     Assert(StringInternArray.items);
 }
 
+internal i64
+GetInternedStringIdx(const char *str)
+{
+    for (usize i = 0; i < StringInternArray.size; ++i) {
+        if (str == StringInternArray.items[i])
+            return i;
+    }
+
+    return -1;
+}
+
 internal const char *
 InternString(const char *str)
 {

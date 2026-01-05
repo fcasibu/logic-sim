@@ -171,3 +171,10 @@ FreeArena(memory_arena *arena)
             (da)->capacity = new_cap;                                                \
         }                                                                            \
     } while (0)
+
+#define ArrayInit(arena, array, cap)                                     \
+    do {                                                                 \
+        (array)->items = PushArray(arena, cap, typeof(*(array)->items)); \
+        (array)->capacity = cap;                                         \
+        (array)->size = 0;                                               \
+    } while (0)

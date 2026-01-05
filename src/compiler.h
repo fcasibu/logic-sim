@@ -1,10 +1,9 @@
-#ifndef PARSER_H
-#define PARSER_H
+#ifndef COMPILER_H
+#define COMPILER_H
 
 // clang-format off
 typedef Enum(u8, token_precedence){
     Prec_None,
-    Prec_Xnor,
     Prec_Imply,
     Prec_Or,
     Prec_Xor,
@@ -22,7 +21,6 @@ typedef struct {
 } parse_rule;
 
 typedef struct {
-    ast_nodes *nodes;
     memory_arena *arena;
 
     token previous;
@@ -31,4 +29,4 @@ typedef struct {
     b32 had_error;
 } parser;
 
-#endif // PARSER_H
+#endif // COMPILER_H
