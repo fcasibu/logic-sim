@@ -1,5 +1,4 @@
 #include <string.h>
-#include <sys/mman.h>
 
 internal void
 InitializeArena(memory_arena *arena, usize size, void *base)
@@ -53,9 +52,8 @@ PushSizeResize_(memory_arena *arena, usize size_init, usize alignment)
     usize size = GetEffectiveSize(arena, size_init, alignment);
     usize block_size = Max(size + header_size, arena->minimum_block_size);
 
-    memory_block *new_block = (memory_block *)mmap(
-        NULL, block_size, PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, -1, 0);
-    Assert(new_block != MAP_FAILED);
+    memory_block *new_block = Platform.AllocateMemory(block_size);
+    Assert(new_block);
 
     new_block->prev = arena->current_block;
     new_block->size = block_size;
@@ -129,12 +127,31 @@ EndTemporaryMemory(temporary_memory temp_mem)
 }
 
 internal void
+ArenaReset(memory_arena *arena)
+{
+    while (arena->current_block->prev != 0) {
+        memory_block *to_free = arena->current_block;
+        memory_block *prev_block = to_free->prev;
+
+        arena->current_block = prev_block;
+        Platform.DeallocateMemory(to_free, to_free->size);
+    }
+
+    memory_block *root = arena->current_block;
+
+    arena->base = (u8 *)root + sizeof(memory_block);
+    arena->used = 0;
+    arena->capacity = root->size - sizeof(memory_block);
+    arena->temp_count = 0;
+}
+
+internal void
 FreeArena(memory_arena *arena)
 {
     memory_block *block = arena->current_block;
     while (block) {
         memory_block *prev = block->prev;
-        munmap(block, block->size);
+        Platform.DeallocateMemory(block, block->size);
         block = prev;
     }
 
@@ -177,4 +194,12 @@ FreeArena(memory_arena *arena)
         (array)->items = PushArray(arena, cap, typeof(*(array)->items)); \
         (array)->capacity = cap;                                         \
         (array)->size = 0;                                               \
+    } while (0)
+
+#define ArrayPush(arena, array, item)              \
+    do {                                           \
+        if ((array)->size >= (array)->capacity)    \
+            GrowArray((arena), (array));           \
+        Assert((array)->size < (array)->capacity); \
+        (array)->items[(array)->size++] = item;    \
     } while (0)

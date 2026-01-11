@@ -22,7 +22,7 @@ InitializeChunk(memory_arena *arena, chunk *c, usize initial_cap)
     c->items = PushArray(arena, initial_cap, typeof(*c->items));
     Assert(c->items);
 
-    InitializeVars(arena, &c->vars, 31);
+    InitializeVars(arena, &c->vars, 10);
 }
 
 internal inline void
@@ -64,7 +64,7 @@ WriteVar(memory_arena *arena, chunk *c, const char *name, usize idx)
     Assert(c);
 
     usize var_idx = AddVar(arena, c, name, idx);
-    Assert((var_idx + 1) <= 31);
+    Assert((var_idx + 1) <= 10);
     WriteChunk(arena, c, OP_Var);
     WriteChunk(arena, c, var_idx);
 }

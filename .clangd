@@ -1,2 +1,2 @@
 CompileFlags:
-  Add: [-include, src/main.c]
+  Add: [-include, src/game.c]

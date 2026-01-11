@@ -1,7 +1,6 @@
 #ifndef VM_H
 #define VM_H
 
-// TODO(fcasibu): hashmap
 typedef struct {
     const char **items;
     usize size;
@@ -18,10 +17,11 @@ typedef struct {
     references vars;
     results results;
 
-    u64 row_count;
+    usize row_count;
 } truth_table;
 
 typedef Enum(u8, eval_type){
+    Eval_None,
     Eval_Ok,
     Eval_ParseError,
 };
@@ -43,8 +43,20 @@ typedef struct {
     u64 *stack_top;
 } vm;
 
+typedef struct {
+    u16 value;
+    u16 mask;
+    b32 used;
+} implicant;
+
+typedef struct {
+    implicant *items;
+    usize size;
+    usize capacity;
+} implicants;
+
 internal u8
-GetTruthValue(truth_table *table, u64 row_idx)
+GetTruthValue(const truth_table *table, u64 row_idx)
 {
     Assert(row_idx < table->row_count);
 

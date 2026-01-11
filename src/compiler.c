@@ -1,7 +1,7 @@
 global parser Parser;
 global chunk *CompilingChunk;
 
-#define MAX_VARS 31
+#define MAX_VARS 10
 
 #define PARSE_FN(name) void name(void)
 internal PARSE_FN(Grouping);
